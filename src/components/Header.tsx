@@ -38,6 +38,14 @@ export const Header = () => {
     });
   };
 
+  // Added navigation handler for the chat placeholder
+  const handleChatClick = () => {
+    toast({
+      title: "End-to-End Encryption Chatting",
+      description: "This feature will allow secure, encrypted messaging. (Coming Soon)",
+    });
+  };
+
   return (
     <header className="bg-black/20 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -135,6 +143,14 @@ export const Header = () => {
                   </Button>
                   <Button variant="ghost" className="w-full justify-start text-white">
                     Privacy Settings
+                  </Button>
+                  {/* Added End-to-End Encryption Chatting menu option */}
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-white"
+                    onClick={handleChatClick}
+                  >
+                    End-to-End Encryption Chatting
                   </Button>
                 </div>
               </SheetContent>
