@@ -3,6 +3,7 @@ import React from 'react';
 import { ThreatMonitor } from './ThreatMonitor';
 import { AIDetectionEngine } from './AIDetectionEngine';
 import { PrivacyAuditor } from './PrivacyAuditor';
+import { SecurityScanner } from './SecurityScanner';
 
 export const FeaturesTab = () => {
   return (
@@ -17,6 +18,7 @@ export const FeaturesTab = () => {
       </div>
       
       <div className="space-y-6">
+        <SecurityScanner />
         <ThreatMonitor />
         <AIDetectionEngine />
         <PrivacyAuditor />
