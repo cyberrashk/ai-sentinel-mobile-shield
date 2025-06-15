@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, Camera, Mic, MapPin, Contacts } from 'lucide-react';
+import { Eye, Camera, Mic, MapPin, Contact } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 
@@ -32,7 +32,7 @@ export const PrivacyAuditor = () => {
       category: 'Contact Access',
       apps: 15,
       risk: 'Medium',
-      icon: Contacts,
+      icon: Contact,
       percentage: 55
     }
   ];
