@@ -23,6 +23,7 @@ import {
 export const Header = () => {
   const { toast } = useToast();
   const [notificationCount, setNotificationCount] = useState(3);
+  const [chatDialogOpen, setChatDialogOpen] = useState(false);
 
   const handleNotificationClick = () => {
     toast({
@@ -35,14 +36,6 @@ export const Header = () => {
     toast({
       title: "Settings",
       description: "Security settings panel opened",
-    });
-  };
-
-  // Added navigation handler for the chat placeholder
-  const handleChatClick = () => {
-    toast({
-      title: "End-to-End Encryption Chatting",
-      description: "This feature will allow secure, encrypted messaging. (Coming Soon)",
     });
   };
 
@@ -144,14 +137,30 @@ export const Header = () => {
                   <Button variant="ghost" className="w-full justify-start text-white">
                     Privacy Settings
                   </Button>
-                  {/* Added End-to-End Encryption Chatting menu option */}
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start text-white"
-                    onClick={handleChatClick}
-                  >
-                    End-to-End Encryption Chatting
-                  </Button>
+                  {/* Updated End-to-End Encryption Chatting menu option to open dialog */}
+                  <Dialog open={chatDialogOpen} onOpenChange={setChatDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start text-white"
+                        onClick={() => setChatDialogOpen(true)}
+                      >
+                        End-to-End Encryption Chatting
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-slate-900 border-slate-700 max-w-md mx-auto">
+                      <DialogHeader>
+                        <DialogTitle className="text-white">End-to-End Encryption Chatting</DialogTitle>
+                        <DialogDescription className="text-slate-300">
+                          <span className="block mb-2">A high-level secure chat for safe private conversations.</span>
+                          <span className="block mb-4 text-yellow-400 font-semibold">Feature Coming Soon</span>
+                          <span className="text-slate-400 text-xs">
+                            This secure chatting feature will utilize advanced end-to-end encryption along with a robust backend. Please check back soon for a fully working encrypted chat.
+                          </span>
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </SheetContent>
             </Sheet>
@@ -161,3 +170,4 @@ export const Header = () => {
     </header>
   );
 };
+
