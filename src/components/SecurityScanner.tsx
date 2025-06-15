@@ -5,12 +5,14 @@ import { Scan, Play, Pause, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 
 export const SecurityScanner = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [scanResults, setScanResults] = useState<any[]>([]);
   const [lastScan, setLastScan] = useState('Never');
+  const { toast } = useToast();
 
   useEffect(() => {
     if (isScanning && scanProgress < 100) {
@@ -18,12 +20,24 @@ export const SecurityScanner = () => {
         setScanProgress(prev => {
           const newProgress = Math.min(prev + Math.random() * 5, 100);
           
-          // Simulate finding threats during scan
+          // Simulate finding threats during scan and show alerts
           if (newProgress > 25 && newProgress < 30 && scanResults.length === 0) {
-            setScanResults([{ type: 'Malware', file: 'suspicious.apk', severity: 'High' }]);
+            const newThreat = { type: 'Malware', file: 'suspicious.apk', severity: 'High' };
+            setScanResults([newThreat]);
+            toast({
+              title: "🚨 Threat Detected!",
+              description: `${newThreat.type} found in ${newThreat.file}`,
+              variant: "destructive",
+            });
           }
           if (newProgress > 60 && newProgress < 65 && scanResults.length === 1) {
-            setScanResults(prev => [...prev, { type: 'Adware', file: 'ad_tracker.js', severity: 'Medium' }]);
+            const newThreat = { type: 'Adware', file: 'ad_tracker.js', severity: 'Medium' };
+            setScanResults(prev => [...prev, newThreat]);
+            toast({
+              title: "⚠️ Additional Threat Found",
+              description: `${newThreat.type} detected in ${newThreat.file}`,
+              variant: "destructive",
+            });
           }
           
           return newProgress;
@@ -33,17 +47,38 @@ export const SecurityScanner = () => {
     } else if (scanProgress >= 100) {
       setIsScanning(false);
       setLastScan(new Date().toLocaleTimeString());
+      
+      // Show completion alert
+      if (scanResults.length === 0) {
+        toast({
+          title: "✅ Scan Complete",
+          description: "No threats detected. Your device is secure!",
+        });
+      } else {
+        toast({
+          title: "🔒 Scan Complete",
+          description: `${scanResults.length} threats detected and quarantined`,
+        });
+      }
     }
-  }, [scanProgress, isScanning, scanResults.length]);
+  }, [scanProgress, isScanning, scanResults.length, toast]);
 
   const startScan = () => {
     setIsScanning(true);
     setScanProgress(0);
     setScanResults([]);
+    toast({
+      title: "🔍 Security Scan Started",
+      description: "Scanning your device for threats...",
+    });
   };
 
   const stopScan = () => {
     setIsScanning(false);
+    toast({
+      title: "⏹️ Scan Stopped",
+      description: "Security scan has been cancelled",
+    });
   };
 
   return (
