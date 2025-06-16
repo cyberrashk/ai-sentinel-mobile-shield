@@ -9,7 +9,126 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      behavioral_patterns: {
+        Row: {
+          created_at: string | null
+          id: string
+          interaction_patterns: Json | null
+          keystroke_dynamics: Json | null
+          risk_score: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          interaction_patterns?: Json | null
+          keystroke_dynamics?: Json | null
+          risk_score?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          interaction_patterns?: Json | null
+          keystroke_dynamics?: Json | null
+          risk_score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      threat_reports: {
+        Row: {
+          compliance_data: Json | null
+          created_at: string | null
+          id: string
+          location_data: Json | null
+          remediation_status: string | null
+          resolved_at: string | null
+          severity: string
+          threat_type: string
+          user_id: string
+        }
+        Insert: {
+          compliance_data?: Json | null
+          created_at?: string | null
+          id?: string
+          location_data?: Json | null
+          remediation_status?: string | null
+          resolved_at?: string | null
+          severity: string
+          threat_type: string
+          user_id: string
+        }
+        Update: {
+          compliance_data?: Json | null
+          created_at?: string | null
+          id?: string
+          location_data?: Json | null
+          remediation_status?: string | null
+          resolved_at?: string | null
+          severity?: string
+          threat_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vpn_sessions: {
+        Row: {
+          encryption_protocol: string | null
+          ended_at: string | null
+          id: string
+          server_location: string
+          session_data: Json | null
+          started_at: string | null
+          user_id: string
+        }
+        Insert: {
+          encryption_protocol?: string | null
+          ended_at?: string | null
+          id?: string
+          server_location: string
+          session_data?: Json | null
+          started_at?: string | null
+          user_id: string
+        }
+        Update: {
+          encryption_protocol?: string | null
+          ended_at?: string | null
+          id?: string
+          server_location?: string
+          session_data?: Json | null
+          started_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

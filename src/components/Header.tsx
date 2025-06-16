@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { Shield, Settings, Bell, Menu } from 'lucide-react';
+import { Shield, Settings, Bell, Menu, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import {
   Sheet,
   SheetContent,
@@ -22,6 +23,7 @@ import {
 
 export const Header = () => {
   const { toast } = useToast();
+  const { user, signOut } = useAuth();
   const [notificationCount, setNotificationCount] = useState(3);
   const [chatDialogOpen, setChatDialogOpen] = useState(false);
 
@@ -36,6 +38,14 @@ export const Header = () => {
     toast({
       title: "Settings",
       description: "Security settings panel opened",
+    });
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Signed Out",
+      description: "You have been successfully signed out",
     });
   };
 
@@ -58,6 +68,11 @@ export const Header = () => {
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               <span className="text-sm font-medium">Protected</span>
             </div>
+            {user && (
+              <span className="text-sm text-slate-300">
+                Welcome, {user.email}
+              </span>
+            )}
           </div>
           
           <div className="flex items-center space-x-2">
@@ -107,9 +122,26 @@ export const Header = () => {
                       Disabled
                     </Button>
                   </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-white">Behavioral Biometrics</span>
+                    <Button size="sm" className="bg-green-500 hover:bg-green-600">
+                      Active
+                    </Button>
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>
+
+            {user && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-white hover:bg-white/10"
+                onClick={handleSignOut}
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            )}
             
             <Sheet>
               <SheetTrigger asChild>
@@ -137,7 +169,9 @@ export const Header = () => {
                   <Button variant="ghost" className="w-full justify-start text-white">
                     Privacy Settings
                   </Button>
-                  {/* Updated End-to-End Encryption Chatting menu option to open dialog */}
+                  <Button variant="ghost" className="w-full justify-start text-white">
+                    Behavioral Analysis
+                  </Button>
                   <Dialog open={chatDialogOpen} onOpenChange={setChatDialogOpen}>
                     <DialogTrigger asChild>
                       <Button 
@@ -170,4 +204,3 @@ export const Header = () => {
     </header>
   );
 };
-
