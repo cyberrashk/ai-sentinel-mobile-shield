@@ -16,37 +16,12 @@ import {
   Zap,
   Database
 } from 'lucide-react';
+import { Tables } from '@/integrations/supabase/types';
 
-interface ThreatSignature {
-  id: string;
-  signature_hash: string;
-  threat_type: string;
-  severity: string;
-  confidence_score: number;
-  first_seen: string;
-  last_seen: string;
-  affected_platforms: string[];
-  mitigation_strategy: any;
-}
-
-interface SystemMetric {
-  id: string;
-  metric_name: string;
-  metric_value: number;
-  metric_type: string;
-  labels: any;
-  timestamp: string;
-}
-
-interface AIModel {
-  id: string;
-  model_name: string;
-  version: string;
-  model_type: string;
-  performance_metrics: any;
-  deployment_status: string;
-  updated_at: string;
-}
+// Use the actual database types from Supabase
+type ThreatSignature = Tables<'threat_signatures'>;
+type SystemMetric = Tables<'system_metrics'>;
+type AIModel = Tables<'ai_models'>;
 
 export const ThreatIntelligenceDashboard = () => {
   const [threatSignatures, setThreatSignatures] = useState<ThreatSignature[]>([]);
@@ -362,21 +337,21 @@ export const ThreatIntelligenceDashboard = () => {
                     <span className="text-white font-medium">{threat.threat_type}</span>
                   </div>
                   <span className="text-slate-400 text-sm">
-                    {(threat.confidence_score * 100).toFixed(1)}%
+                    {threat.confidence_score ? (threat.confidence_score * 100).toFixed(1) : 0}%
                   </span>
                 </div>
                 <p className="text-slate-400 text-sm mb-2">
                   Hash: {threat.signature_hash}
                 </p>
                 <div className="flex justify-between text-xs text-slate-500">
-                  <span>First: {new Date(threat.first_seen).toLocaleDateString()}</span>
-                  <span>Last: {new Date(threat.last_seen).toLocaleDateString()}</span>
+                  <span>First: {threat.first_seen ? new Date(threat.first_seen).toLocaleDateString() : 'N/A'}</span>
+                  <span>Last: {threat.last_seen ? new Date(threat.last_seen).toLocaleDateString() : 'N/A'}</span>
                 </div>
                 <div className="mt-2">
                   <div className="flex flex-wrap gap-1">
-                    {threat.affected_platforms.map((platform, index) => (
+                    {(Array.isArray(threat.affected_platforms) ? threat.affected_platforms : []).map((platform, index) => (
                       <Badge key={index} className="bg-slate-700 text-slate-300 text-xs">
-                        {platform}
+                        {String(platform)}
                       </Badge>
                     ))}
                   </div>
@@ -403,14 +378,14 @@ export const ThreatIntelligenceDashboard = () => {
                     <span className="text-white font-medium">{model.model_name}</span>
                     <span className="text-slate-400 text-sm">v{model.version}</span>
                   </div>
-                  <Badge className={getModelStatusColor(model.deployment_status)}>
-                    {model.deployment_status}
+                  <Badge className={getModelStatusColor(model.deployment_status || 'unknown')}>
+                    {model.deployment_status || 'unknown'}
                   </Badge>
                 </div>
                 <div className="text-slate-400 text-sm mb-2">
                   Type: {model.model_type}
                 </div>
-                {model.performance_metrics && (
+                {model.performance_metrics && typeof model.performance_metrics === 'object' && (
                   <div className="space-y-1">
                     {Object.entries(model.performance_metrics).map(([key, value]) => (
                       <div key={key} className="flex justify-between text-xs">
@@ -423,7 +398,7 @@ export const ThreatIntelligenceDashboard = () => {
                   </div>
                 )}
                 <div className="text-xs text-slate-500 mt-2">
-                  Updated: {new Date(model.updated_at).toLocaleString()}
+                  Updated: {model.updated_at ? new Date(model.updated_at).toLocaleString() : 'N/A'}
                 </div>
               </div>
             ))}
