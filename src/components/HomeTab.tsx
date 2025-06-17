@@ -4,6 +4,7 @@ import { SecurityDashboard } from './SecurityDashboard';
 import { SecurityMetrics } from './SecurityMetrics';
 import { AIMLScanner } from './AIMLScanner';
 import { MobileThreatScanner } from './MobileThreatScanner';
+import { AdvancedThreatScanner } from './AdvancedThreatScanner';
 
 export const HomeTab = () => {
   return (
@@ -34,6 +35,18 @@ export const HomeTab = () => {
           <MobileThreatScanner />
           <SecurityMetrics />
         </div>
+      </div>
+
+      {/* Advanced Enterprise Threat Scanner Section */}
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-white mb-2">Enterprise APK & URL Threat Detection</h2>
+          <p className="text-slate-300">
+            Advanced AI-powered APK analysis and URL scanning with enterprise-grade threat intelligence
+          </p>
+        </div>
+        
+        <AdvancedThreatScanner />
       </div>
     </div>
   );
