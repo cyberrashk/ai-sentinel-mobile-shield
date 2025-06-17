@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,8 +33,38 @@ export const ThreatIntelligenceDashboard = () => {
     fetchThreatSignatures();
     fetchSystemMetrics();
     fetchAIModels();
-    setupRealTimeSubscriptions();
-  }, []);
+
+    // Set up real-time subscriptions with proper cleanup
+    const threatChannel = supabase
+      .channel('threat_signatures_changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'threat_signatures'
+      }, (payload) => {
+        console.log('Threat signature update:', payload);
+        fetchThreatSignatures();
+      })
+      .subscribe();
+
+    const metricsChannel = supabase
+      .channel('system_metrics_changes')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'system_metrics'
+      }, (payload) => {
+        console.log('New metric:', payload);
+        setSystemMetrics(prev => [payload.new as SystemMetric, ...prev.slice(0, 49)]);
+      })
+      .subscribe();
+
+    // Cleanup function
+    return () => {
+      supabase.removeChannel(threatChannel);
+      supabase.removeChannel(metricsChannel);
+    };
+  }, []); // Empty dependency array to prevent re-running
 
   const fetchThreatSignatures = async () => {
     const { data, error } = await supabase
@@ -79,39 +108,6 @@ export const ThreatIntelligenceDashboard = () => {
     }
 
     setAIModels(data || []);
-  };
-
-  const setupRealTimeSubscriptions = () => {
-    // Subscribe to threat signatures
-    const threatChannel = supabase
-      .channel('threat_signatures_changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'threat_signatures'
-      }, (payload) => {
-        console.log('Threat signature update:', payload);
-        fetchThreatSignatures();
-      })
-      .subscribe();
-
-    // Subscribe to system metrics
-    const metricsChannel = supabase
-      .channel('system_metrics_changes')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'system_metrics'
-      }, (payload) => {
-        console.log('New metric:', payload);
-        setSystemMetrics(prev => [payload.new as SystemMetric, ...prev.slice(0, 49)]);
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(threatChannel);
-      supabase.removeChannel(metricsChannel);
-    };
   };
 
   const runThreatAnalysis = async (analysisType: string) => {
