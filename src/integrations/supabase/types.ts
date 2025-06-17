@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_models: {
+        Row: {
+          created_at: string | null
+          deployment_status: string | null
+          id: string
+          model_name: string
+          model_type: string
+          performance_metrics: Json | null
+          updated_at: string | null
+          version: string
+          weights_data: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          deployment_status?: string | null
+          id?: string
+          model_name: string
+          model_type: string
+          performance_metrics?: Json | null
+          updated_at?: string | null
+          version: string
+          weights_data?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          deployment_status?: string | null
+          id?: string
+          model_name?: string
+          model_type?: string
+          performance_metrics?: Json | null
+          updated_at?: string | null
+          version?: string
+          weights_data?: Json | null
+        }
+        Relationships: []
+      }
       behavioral_patterns: {
         Row: {
           created_at: string | null
@@ -36,6 +72,50 @@ export type Database = {
         }
         Relationships: []
       }
+      federated_learning_updates: {
+        Row: {
+          aggregated: boolean | null
+          contribution_score: number | null
+          created_at: string | null
+          id: string
+          local_weights: Json
+          model_id: string
+          performance_delta: number | null
+          training_samples: number | null
+          user_id: string
+        }
+        Insert: {
+          aggregated?: boolean | null
+          contribution_score?: number | null
+          created_at?: string | null
+          id?: string
+          local_weights: Json
+          model_id: string
+          performance_delta?: number | null
+          training_samples?: number | null
+          user_id: string
+        }
+        Update: {
+          aggregated?: boolean | null
+          contribution_score?: number | null
+          created_at?: string | null
+          id?: string
+          local_weights?: Json
+          model_id?: string
+          performance_delta?: number | null
+          training_samples?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "federated_learning_updates_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -60,6 +140,69 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      system_metrics: {
+        Row: {
+          id: string
+          labels: Json | null
+          metric_name: string
+          metric_type: string
+          metric_value: number
+          timestamp: string | null
+        }
+        Insert: {
+          id?: string
+          labels?: Json | null
+          metric_name: string
+          metric_type: string
+          metric_value: number
+          timestamp?: string | null
+        }
+        Update: {
+          id?: string
+          labels?: Json | null
+          metric_name?: string
+          metric_type?: string
+          metric_value?: number
+          timestamp?: string | null
+        }
+        Relationships: []
+      }
+      threat_analysis_logs: {
+        Row: {
+          analysis_type: string
+          confidence_score: number | null
+          created_at: string | null
+          id: string
+          input_data: Json
+          processing_time_ms: number | null
+          result_data: Json
+          threat_detected: boolean | null
+          user_id: string
+        }
+        Insert: {
+          analysis_type: string
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          input_data: Json
+          processing_time_ms?: number | null
+          result_data: Json
+          threat_detected?: boolean | null
+          user_id: string
+        }
+        Update: {
+          analysis_type?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          input_data?: Json
+          processing_time_ms?: number | null
+          result_data?: Json
+          threat_detected?: boolean | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -95,6 +238,93 @@ export type Database = {
           resolved_at?: string | null
           severity?: string
           threat_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      threat_signatures: {
+        Row: {
+          affected_platforms: Json | null
+          confidence_score: number | null
+          created_at: string | null
+          first_seen: string | null
+          geo_heatmap: Json | null
+          id: string
+          last_seen: string | null
+          mitigation_strategy: Json | null
+          severity: string
+          signature_hash: string
+          threat_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          affected_platforms?: Json | null
+          confidence_score?: number | null
+          created_at?: string | null
+          first_seen?: string | null
+          geo_heatmap?: Json | null
+          id?: string
+          last_seen?: string | null
+          mitigation_strategy?: Json | null
+          severity: string
+          signature_hash: string
+          threat_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          affected_platforms?: Json | null
+          confidence_score?: number | null
+          created_at?: string | null
+          first_seen?: string | null
+          geo_heatmap?: Json | null
+          id?: string
+          last_seen?: string | null
+          mitigation_strategy?: Json | null
+          severity?: string
+          signature_hash?: string
+          threat_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_sessions_enhanced: {
+        Row: {
+          active_threats: Json | null
+          behavioral_patterns: Json | null
+          device_fingerprint: Json | null
+          id: string
+          last_activity: string | null
+          location_data: Json | null
+          risk_score: number | null
+          session_end: string | null
+          session_start: string | null
+          session_token: string
+          user_id: string
+        }
+        Insert: {
+          active_threats?: Json | null
+          behavioral_patterns?: Json | null
+          device_fingerprint?: Json | null
+          id?: string
+          last_activity?: string | null
+          location_data?: Json | null
+          risk_score?: number | null
+          session_end?: string | null
+          session_start?: string | null
+          session_token: string
+          user_id: string
+        }
+        Update: {
+          active_threats?: Json | null
+          behavioral_patterns?: Json | null
+          device_fingerprint?: Json | null
+          id?: string
+          last_activity?: string | null
+          location_data?: Json | null
+          risk_score?: number | null
+          session_end?: string | null
+          session_start?: string | null
+          session_token?: string
           user_id?: string
         }
         Relationships: []
