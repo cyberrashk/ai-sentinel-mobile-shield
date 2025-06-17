@@ -267,11 +267,27 @@ export const AIMLScanner = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
+      // Convert ScanResult to JSON-compatible format
+      const resultData = {
+        scanType: result.scanType,
+        riskScore: result.riskScore,
+        threatDetected: result.threatDetected,
+        confidence: result.confidence,
+        findings: result.findings,
+        recommendations: result.recommendations,
+        timestamp: result.timestamp
+      };
+
+      const inputData = { 
+        scan_phase: currentScanPhase,
+        analysis_type: analysisType
+      };
+
       await supabase.from('threat_analysis_logs').insert({
         user_id: session.user.id,
         analysis_type: analysisType,
-        input_data: { scan_phase: currentScanPhase },
-        result_data: result,
+        input_data: inputData,
+        result_data: resultData,
         confidence_score: result.confidence,
         threat_detected: result.threatDetected
       });
