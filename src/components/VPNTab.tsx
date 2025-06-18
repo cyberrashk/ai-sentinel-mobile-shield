@@ -1,20 +1,24 @@
 
 import React from 'react';
-import { EnhancedVPN } from './EnhancedVPN';
+import { AIVPNCore } from './AIVPNCore';
+import { VPNThreatMonitor } from './VPNThreatMonitor';
 
 export const VPNTab = () => {
   return (
     <div className="space-y-8">
       <div className="text-center mb-8">
         <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
-          Secure VPN & Traffic Analysis
+          AI-Powered VPN Shield
         </h2>
         <p className="text-slate-300">
-          Protect your connection with military-grade encryption and real-time traffic monitoring
+          Military-grade encryption with AI threat protection, quantum-resistant security, and intelligent routing
         </p>
       </div>
 
-      <EnhancedVPN />
+      <div className="space-y-6">
+        <AIVPNCore />
+        <VPNThreatMonitor />
+      </div>
     </div>
   );
 };
