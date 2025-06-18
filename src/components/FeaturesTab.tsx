@@ -8,7 +8,6 @@ import { EnhancedAIDetectionEngine } from './EnhancedAIDetectionEngine';
 import { SecurityScoreGame } from './SecurityScoreGame';
 import { LiveAttackTimeline } from './LiveAttackTimeline';
 import { EmergencyResponse } from './EmergencyResponse';
-import { AdvancedThreatScanner } from './AdvancedThreatScanner';
 
 export const FeaturesTab = () => {
   return (
@@ -20,17 +19,6 @@ export const FeaturesTab = () => {
         <p className="text-slate-300">
           Advanced protection powered by next-generation AI technology
         </p>
-      </div>
-      
-      {/* Advanced Threat Scanner - Featured prominently */}
-      <div className="space-y-6">
-        <div className="text-center">
-          <h3 className="text-xl font-bold text-white mb-2">Enterprise APK & URL Threat Detection</h3>
-          <p className="text-slate-300">
-            Advanced AI-powered APK analysis and URL scanning with enterprise-grade threat intelligence
-          </p>
-        </div>
-        <AdvancedThreatScanner />
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

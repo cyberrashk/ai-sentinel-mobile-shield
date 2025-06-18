@@ -7,6 +7,7 @@ import { HomeTab } from '../components/HomeTab';
 import { FeaturesTab } from '../components/FeaturesTab';
 import { VPNTab } from '../components/VPNTab';
 import { EnhancedSecurityTab } from '../components/EnhancedSecurityTab';
+import { ThreatScannerTab } from '../components/ThreatScannerTab';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -68,6 +69,8 @@ const Index = () => {
         return <VPNTab />;
       case 'enhanced':
         return <EnhancedSecurityTab />;
+      case 'scanner':
+        return <ThreatScannerTab />;
       default:
         return <HomeTab />;
     }

@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { EnhancedVPN } from './EnhancedVPN';
-import { AdvancedThreatScanner } from './AdvancedThreatScanner';
 
 export const VPNTab = () => {
   return (
@@ -11,22 +10,11 @@ export const VPNTab = () => {
           Secure VPN & Traffic Analysis
         </h2>
         <p className="text-slate-300">
-          Protect your connection with military-grade encryption and real-time threat scanning
+          Protect your connection with military-grade encryption and real-time traffic monitoring
         </p>
       </div>
 
       <EnhancedVPN />
-
-      {/* VPN-integrated Threat Scanning */}
-      <div className="space-y-6">
-        <div className="text-center">
-          <h3 className="text-xl font-bold text-white mb-2">VPN Traffic Threat Analysis</h3>
-          <p className="text-slate-300">
-            Real-time URL scanning and APK analysis while connected to VPN
-          </p>
-        </div>
-        <AdvancedThreatScanner />
-      </div>
     </div>
   );
 };

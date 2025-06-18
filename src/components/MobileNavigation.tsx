@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Shield, Wifi, Brain } from 'lucide-react';
+import { Home, Shield, Wifi, Brain, Search } from 'lucide-react';
 
 interface MobileNavigationProps {
   activeTab: string;
@@ -13,6 +13,7 @@ export const MobileNavigation = ({ activeTab, onTabChange }: MobileNavigationPro
     { id: 'features', label: 'Features', icon: Shield },
     { id: 'vpn', label: 'VPN', icon: Wifi },
     { id: 'enhanced', label: 'AI Security', icon: Brain },
+    { id: 'scanner', label: 'Scanner', icon: Search },
   ];
 
   return (
