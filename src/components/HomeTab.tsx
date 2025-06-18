@@ -1,9 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { SecurityDashboard } from './SecurityDashboard';
-import { SecurityMetrics } from './SecurityMetrics';
-import { AIMLScanner } from './AIMLScanner';
-import { MobileThreatScanner } from './MobileThreatScanner';
 import { Button } from '@/components/ui/button';
 import { Shield, CheckCircle, AlertTriangle, Radar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -13,7 +9,6 @@ export const HomeTab = () => {
   const [scanComplete, setScanComplete] = useState(false);
   const [threatsFound, setThreatsFound] = useState(false);
   const [securityScore, setSecurityScore] = useState(98);
-  const [showDetails, setShowDetails] = useState(false);
   const { toast } = useToast();
 
   const startScan = () => {
@@ -22,11 +17,11 @@ export const HomeTab = () => {
     setThreatsFound(false);
     
     toast({
-      title: "🔍 Security Scan Started",
-      description: "Scanning your device for threats...",
+      title: "🔍 AI/ML Security Scan Started",
+      description: "TensorFlow-powered threat detection analyzing your device...",
     });
 
-    // Simulate scan process
+    // Simulate AI/ML scan process
     setTimeout(() => {
       setIsScanning(false);
       setScanComplete(true);
@@ -39,14 +34,14 @@ export const HomeTab = () => {
         setSecurityScore(Math.floor(Math.random() * 30) + 60); // 60-89
         toast({
           title: "⚠️ Threats Detected",
-          description: "Potential security issues found. Tap for details.",
+          description: "AI models identified potential security issues.",
           variant: "destructive",
         });
       } else {
         setSecurityScore(Math.floor(Math.random() * 10) + 90); // 90-99
         toast({
           title: "✅ Device Secure",
-          description: "No threats detected. Your device is protected!",
+          description: "AI analysis complete - no threats detected!",
         });
       }
     }, 3000);
@@ -54,8 +49,8 @@ export const HomeTab = () => {
 
   const handleLongPress = () => {
     toast({
-      title: "🔬 Deep Scan Mode",
-      description: "Initiating comprehensive security analysis...",
+      title: "🧠 Deep AI Analysis",
+      description: "Initiating advanced TensorFlow neural network scan...",
     });
     startScan();
   };
@@ -145,12 +140,12 @@ export const HomeTab = () => {
                 
                 <span className="text-center leading-tight">
                   {isScanning 
-                    ? 'Scanning...' 
+                    ? 'AI Scanning...' 
                     : scanComplete 
                       ? threatsFound 
                         ? 'Threats Found' 
                         : 'Device Secure'
-                      : 'Scan Now'
+                      : 'AI Scan Now'
                   }
                 </span>
               </div>
@@ -171,65 +166,23 @@ export const HomeTab = () => {
           </div>
 
           {/* Minimal Status Text */}
-          {!showDetails && (
-            <div className="text-center space-y-2">
-              <p className="text-white/80 text-lg">
-                {isScanning 
-                  ? 'Analyzing your device security...' 
-                  : scanComplete 
-                    ? threatsFound 
-                      ? 'Swipe up for threat details' 
-                      : 'Your device is protected'
-                    : 'Tap to start security scan'
-                }
-              </p>
-              {!isScanning && !scanComplete && (
-                <p className="text-white/50 text-sm">Hold for deep scan</p>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Swipe Up Indicator */}
-        {scanComplete && !showDetails && (
-          <div 
-            className="absolute bottom-20 left-1/2 transform -translate-x-1/2 cursor-pointer"
-            onClick={() => setShowDetails(true)}
-          >
-            <div className="flex flex-col items-center space-y-2 animate-bounce">
-              <div className="w-1 h-8 bg-white/50 rounded-full" />
-              <span className="text-white/70 text-sm">Swipe up for details</span>
-            </div>
+          <div className="text-center space-y-2">
+            <p className="text-white/80 text-lg">
+              {isScanning 
+                ? 'TensorFlow AI analyzing device security...' 
+                : scanComplete 
+                  ? threatsFound 
+                    ? 'AI detected security issues' 
+                    : 'AI confirms device is protected'
+                  : 'Tap for AI-powered security scan'
+              }
+            </p>
+            {!isScanning && !scanComplete && (
+              <p className="text-white/50 text-sm">Hold for deep neural analysis</p>
+            )}
           </div>
-        )}
+        </div>
       </div>
-
-      {/* Detailed Report (Hidden by default) */}
-      {showDetails && (
-        <div className="absolute inset-x-0 bottom-0 bg-black/40 backdrop-blur-xl border-t border-white/10 rounded-t-3xl z-20 p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold text-white">Scan Report</h3>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setShowDetails(false)}
-              className="text-white/70 hover:text-white"
-            >
-              ✕
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <SecurityDashboard />
-            <SecurityMetrics />
-          </div>
-          
-          <div className="space-y-6">
-            <AIMLScanner />
-            <MobileThreatScanner />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
