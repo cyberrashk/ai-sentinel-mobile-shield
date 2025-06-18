@@ -49,6 +49,7 @@ interface ConnectionStats {
 }
 
 interface ThreatDetection {
+  [key: string]: boolean;
   enabled: boolean;
   real_time_scanning: boolean;
   dns_filtering: boolean;
@@ -213,7 +214,7 @@ export const AIVPNCore = () => {
             security_score: server.security_score,
             ai_optimization: server.ai_optimization,
             threat_detection: threatDetection,
-          },
+          } as any,
         });
       }
     } catch (error) {
