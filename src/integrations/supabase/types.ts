@@ -72,6 +72,36 @@ export type Database = {
         }
         Relationships: []
       }
+      encrypted_messages: {
+        Row: {
+          created_at: string
+          encrypted_content: number[]
+          id: string
+          iv: number[]
+          mac: number[]
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          encrypted_content: number[]
+          id?: string
+          iv: number[]
+          mac: number[]
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          encrypted_content?: number[]
+          id?: string
+          iv?: number[]
+          mac?: number[]
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       federated_learning_updates: {
         Row: {
           aggregated: boolean | null
@@ -284,6 +314,33 @@ export type Database = {
           signature_hash?: string
           threat_type?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_key_pairs: {
+        Row: {
+          created_at: string
+          id: string
+          private_key: number[]
+          public_key: number[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          private_key: number[]
+          public_key: number[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          private_key?: number[]
+          public_key?: number[]
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

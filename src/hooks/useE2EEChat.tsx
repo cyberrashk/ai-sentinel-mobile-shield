@@ -9,9 +9,9 @@ interface ChatMessage {
   id: string;
   sender_id: string;
   recipient_id: string;
-  encrypted_content: string;
-  iv: string;
-  mac: string;
+  encrypted_content: number[];
+  iv: number[];
+  mac: number[];
   created_at: string;
   sender_public_key?: string;
 }
@@ -145,7 +145,7 @@ export const useE2EEChat = (recipientId?: string) => {
                 recipient_id: msg.recipient_id,
                 content: decryptedContent,
                 created_at: msg.created_at,
-                sender_name: msg.profiles?.full_name
+                sender_name: (msg.profiles as any)?.full_name
               });
             }
           } catch (error) {
