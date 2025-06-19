@@ -1,14 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Shield, CheckCircle, AlertTriangle, Radar } from 'lucide-react';
+import { Shield, CheckCircle, AlertTriangle, Radar, Brain, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { AIMLScanner } from './AIMLScanner';
 
 export const HomeTab = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [scanComplete, setScanComplete] = useState(false);
   const [threatsFound, setThreatsFound] = useState(false);
   const [securityScore, setSecurityScore] = useState(98);
+  const [showAdvancedScan, setShowAdvancedScan] = useState(false);
   const { toast } = useToast();
 
   const startScan = () => {
@@ -54,6 +56,24 @@ export const HomeTab = () => {
     });
     startScan();
   };
+
+  if (showAdvancedScan) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-white">Advanced AI/ML Security Scanner</h2>
+          <Button
+            onClick={() => setShowAdvancedScan(false)}
+            variant="outline"
+            className="text-white border-white/20 hover:bg-white/10"
+          >
+            Back to Home
+          </Button>
+        </div>
+        <AIMLScanner />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -165,6 +185,27 @@ export const HomeTab = () => {
             </Button>
           </div>
 
+          {/* Action Buttons */}
+          <div className="flex gap-4">
+            <Button
+              onClick={() => setShowAdvancedScan(true)}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3"
+            >
+              <Brain className="h-5 w-5 mr-2" />
+              Advanced AI Scanner
+            </Button>
+            
+            {scanComplete && threatsFound && (
+              <Button
+                onClick={() => setShowAdvancedScan(true)}
+                className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-6 py-3 animate-pulse"
+              >
+                <Zap className="h-5 w-5 mr-2" />
+                Resolve Issues
+              </Button>
+            )}
+          </div>
+
           {/* Minimal Status Text */}
           <div className="text-center space-y-2">
             <p className="text-white/80 text-lg">
@@ -172,7 +213,7 @@ export const HomeTab = () => {
                 ? 'TensorFlow AI analyzing device security...' 
                 : scanComplete 
                   ? threatsFound 
-                    ? 'AI detected security issues' 
+                    ? 'AI detected security issues - Advanced scanner available' 
                     : 'AI confirms device is protected'
                   : 'Tap for AI-powered security scan'
               }
