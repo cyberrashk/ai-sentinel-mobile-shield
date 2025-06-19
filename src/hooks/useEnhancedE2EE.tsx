@@ -126,8 +126,7 @@ export const useEnhancedE2EE = () => {
         .from('chat_rooms')
         .select(`
           *,
-          room_members!inner(user_id, role),
-          messages(content, created_at)
+          room_members!inner(user_id, role)
         `)
         .order('updated_at', { ascending: false });
 
@@ -140,8 +139,6 @@ export const useEnhancedE2EE = () => {
           is_encrypted: room.is_encrypted,
           created_at: room.created_at,
           member_count: room.room_members?.length || 0,
-          last_message: room.messages?.[0]?.content,
-          last_message_at: room.messages?.[0]?.created_at,
           unread_count: 0 // TODO: Calculate actual unread count
         }));
 
