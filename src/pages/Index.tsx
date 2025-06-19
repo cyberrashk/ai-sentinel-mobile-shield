@@ -65,6 +65,8 @@ const Index = () => {
         return <HomeTab />;
       case 'features':
         return <FeaturesTab />;
+      case 'chat':
+        return <ChatTab />;
       case 'vpn':
         return <VPNTab />;
       case 'enhanced':
