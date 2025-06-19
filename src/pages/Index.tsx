@@ -5,6 +5,7 @@ import { Header } from '../components/Header';
 import { MobileNavigation } from '../components/MobileNavigation';
 import { HomeTab } from '../components/HomeTab';
 import { FeaturesTab } from '../components/FeaturesTab';
+import { ChatTab } from '../components/ChatTab';
 import { VPNTab } from '../components/VPNTab';
 import { EnhancedSecurityTab } from '../components/EnhancedSecurityTab';
 import { ThreatScannerTab } from '../components/ThreatScannerTab';
