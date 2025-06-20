@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { E2EECrypto } from '@/utils/crypto';
@@ -117,18 +116,33 @@ export const useEnhancedE2EE = () => {
     initializeKeys();
   }, [user, toast]);
 
-  // Load user's chat rooms
+  // Load user's chat rooms with enhanced error handling
   const loadRooms = useCallback(async () => {
     if (!user) return;
 
     try {
-      const { data: roomsData } = await supabase
+      const { data: roomsData, error } = await supabase
         .from('chat_rooms')
         .select(`
           *,
-          room_members!inner(user_id, role)
+          room_members!inner(user_id, role),
+          messages(
+            id,
+            encrypted_content,
+            created_at
+          )
         `)
         .order('updated_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading rooms:', error);
+        toast({
+          title: "Load Error",
+          description: "Failed to load chat rooms",
+          variant: "destructive"
+        });
+        return;
+      }
 
       if (roomsData) {
         const processedRooms: ChatRoom[] = roomsData.map(room => ({
@@ -139,6 +153,8 @@ export const useEnhancedE2EE = () => {
           is_encrypted: room.is_encrypted,
           created_at: room.created_at,
           member_count: room.room_members?.length || 0,
+          last_message: room.messages?.[0] ? 'Encrypted message' : undefined,
+          last_message_at: room.messages?.[0]?.created_at,
           unread_count: 0 // TODO: Calculate actual unread count
         }));
 
@@ -146,8 +162,13 @@ export const useEnhancedE2EE = () => {
       }
     } catch (error) {
       console.error('Error loading rooms:', error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to chat backend",
+        variant: "destructive"
+      });
     }
-  }, [user]);
+  }, [user, toast]);
 
   // Load messages for a room
   const loadMessages = useCallback(async (roomId: string) => {
@@ -233,7 +254,7 @@ export const useEnhancedE2EE = () => {
     }
   }, [user, keyPair, sharedKeys]);
 
-  // Send message
+  // Enhanced send message with better error handling
   const sendMessage = useCallback(async (
     roomId: string, 
     content: string, 
@@ -244,26 +265,35 @@ export const useEnhancedE2EE = () => {
     if (!user || !keyPair || !content.trim()) return;
 
     try {
-      // For direct messages, we need the recipient's public key
-      // For group messages, we'd use the group key (to be implemented)
-      const { data: roomMembers } = await supabase
+      // Enhanced room member validation
+      const { data: roomMembers, error: membersError } = await supabase
         .from('room_members')
-        .select('user_id')
+        .select('user_id, room_id')
         .eq('room_id', roomId)
         .neq('user_id', user.id);
 
-      if (!roomMembers || roomMembers.length === 0) return;
+      if (membersError) {
+        throw new Error(`Failed to get room members: ${membersError.message}`);
+      }
+
+      if (!roomMembers || roomMembers.length === 0) {
+        throw new Error('No recipients found in this room');
+      }
 
       // For simplicity, using the first other member's key for direct messages
       const recipientId = roomMembers[0].user_id;
       
       let sharedKey = sharedKeys.get(recipientId);
       if (!sharedKey) {
-        const { data: recipientKeyData } = await supabase
+        const { data: recipientKeyData, error: keyError } = await supabase
           .from('user_key_pairs')
           .select('public_key')
           .eq('user_id', recipientId)
           .single();
+
+        if (keyError) {
+          throw new Error(`Failed to get recipient key: ${keyError.message}`);
+        }
 
         if (recipientKeyData) {
           const recipientPublicKey = await E2EECrypto.importPublicKey(
@@ -276,12 +306,12 @@ export const useEnhancedE2EE = () => {
 
       if (!sharedKey) throw new Error('Could not establish shared key');
 
-      // Encrypt message
+      // Encrypt message with enhanced security
       const { encryptedData, iv } = await E2EECrypto.encryptMessage(content, sharedKey);
       const mac = await E2EECrypto.generateMAC(content, sharedKey);
 
-      // Send encrypted message
-      await supabase.from('messages').insert({
+      // Send encrypted message with metadata
+      const { error: insertError } = await supabase.from('messages').insert({
         room_id: roomId,
         sender_id: user.id,
         message_type: messageType,
@@ -292,8 +322,23 @@ export const useEnhancedE2EE = () => {
         file_url: fileData?.url,
         file_name: fileData?.name,
         file_size: fileData?.size,
-        file_type: fileData?.type
+        file_type: fileData?.type,
+        metadata: {
+          client_version: '1.0.0',
+          encryption_method: 'ECDH-AES-256-GCM',
+          timestamp: new Date().toISOString()
+        }
       });
+
+      if (insertError) {
+        throw new Error(`Failed to send message: ${insertError.message}`);
+      }
+
+      // Update room's last activity
+      await supabase
+        .from('chat_rooms')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', roomId);
 
       toast({
         title: "Message Sent",
@@ -304,9 +349,10 @@ export const useEnhancedE2EE = () => {
       console.error('Error sending message:', error);
       toast({
         title: "Send Failed",
-        description: "Failed to send encrypted message",
+        description: error instanceof Error ? error.message : "Failed to send encrypted message",
         variant: "destructive"
       });
+      throw error;
     }
   }, [user, keyPair, sharedKeys, toast]);
 
@@ -329,22 +375,33 @@ export const useEnhancedE2EE = () => {
     return null;
   }, [user, loadRooms]);
 
-  // Add message reaction
+  // Enhanced add reaction with error handling
   const addReaction = useCallback(async (messageId: string, emoji: string) => {
     if (!user) return;
 
     try {
-      await supabase.from('message_reactions').insert({
+      const { error } = await supabase.from('message_reactions').upsert({
         message_id: messageId,
         user_id: user.id,
         emoji
+      }, {
+        onConflict: 'message_id,user_id,emoji'
       });
+
+      if (error) {
+        throw new Error(`Failed to add reaction: ${error.message}`);
+      }
     } catch (error) {
       console.error('Error adding reaction:', error);
+      toast({
+        title: "Reaction Failed",
+        description: "Failed to add reaction",
+        variant: "destructive"
+      });
     }
-  }, [user]);
+  }, [user, toast]);
 
-  // Update user presence
+  // Enhanced update presence with validation
   const updatePresence = useCallback(async (
     status: 'online' | 'offline' | 'away' | 'busy',
     customStatus?: string,
@@ -353,7 +410,7 @@ export const useEnhancedE2EE = () => {
     if (!user) return;
 
     try {
-      await supabase.from('user_presence').upsert({
+      const { error } = await supabase.from('user_presence').upsert({
         user_id: user.id,
         status,
         custom_status: customStatus,
@@ -361,62 +418,91 @@ export const useEnhancedE2EE = () => {
         is_typing: !!typingInRoom,
         updated_at: new Date().toISOString()
       });
+
+      if (error) {
+        console.error('Error updating presence:', error);
+      }
     } catch (error) {
       console.error('Error updating presence:', error);
     }
   }, [user]);
 
-  // Set up real-time subscriptions
+  // Enhanced real-time subscriptions with error handling
   useEffect(() => {
     if (!user) return;
 
     const channels: any[] = [];
 
-    // Subscribe to room changes
-    const roomsChannel = supabase
-      .channel('rooms-changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'chat_rooms'
-      }, () => {
-        loadRooms();
-      })
-      .subscribe();
+    try {
+      // Subscribe to room changes
+      const roomsChannel = supabase
+        .channel('rooms-changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'chat_rooms'
+        }, (payload) => {
+          console.log('Room change:', payload);
+          loadRooms();
+        })
+        .subscribe((status) => {
+          console.log('Rooms channel status:', status);
+        });
 
-    // Subscribe to message changes
-    const messagesChannel = supabase
-      .channel('messages-changes')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages'
-      }, () => {
-        if (currentRoom) {
-          loadMessages(currentRoom.id);
-        }
-      })
-      .subscribe();
+      // Subscribe to message changes
+      const messagesChannel = supabase
+        .channel('messages-changes')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages'
+        }, (payload) => {
+          console.log('New message:', payload);
+          if (currentRoom) {
+            loadMessages(currentRoom.id);
+          }
+        })
+        .subscribe((status) => {
+          console.log('Messages channel status:', status);
+        });
 
-    // Subscribe to presence changes
-    const presenceChannel = supabase
-      .channel('presence-changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'user_presence'
-      }, (payload) => {
-        const presence = payload.new as UserPresence;
-        setUserPresence(prev => new Map(prev).set(presence.user_id, presence));
-      })
-      .subscribe();
+      // Subscribe to presence changes
+      const presenceChannel = supabase
+        .channel('presence-changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'user_presence'
+        }, (payload) => {
+          console.log('Presence change:', payload);
+          const presence = payload.new as UserPresence;
+          setUserPresence(prev => new Map(prev).set(presence.user_id, presence));
+        })
+        .subscribe((status) => {
+          console.log('Presence channel status:', status);
+        });
 
-    channels.push(roomsChannel, messagesChannel, presenceChannel);
+      channels.push(roomsChannel, messagesChannel, presenceChannel);
+
+    } catch (error) {
+      console.error('Error setting up real-time subscriptions:', error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to establish real-time connection",
+        variant: "destructive"
+      });
+    }
 
     return () => {
-      channels.forEach(channel => supabase.removeChannel(channel));
+      channels.forEach(channel => {
+        try {
+          supabase.removeChannel(channel);
+        } catch (error) {
+          console.error('Error removing channel:', error);
+        }
+      });
     };
-  }, [user, currentRoom, loadRooms, loadMessages]);
+  }, [user, currentRoom, loadRooms, loadMessages, toast]);
 
   // Load initial data
   useEffect(() => {
